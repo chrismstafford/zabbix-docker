@@ -323,16 +323,21 @@ services:
    - ${ENV_VARS_DIRECTORY}/.env_web
    - path: ${ENV_VARS_DIRECTORY}/.env_web_override
      required: false
-  healthcheck:
-   test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
-   interval: 10s
-   timeout: 5s
-   retries: 3
-   start_period: 30s
+  # healthcheck:
+  #  test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+  #  interval: 10s
+  #  timeout: 5s
+  #  retries: 3
+  #  start_period: 30s
   networks:
    database:
    backend:
+    aliases:
+     - zabbix-web-nginx-mysql   
    frontend:
+    aliases:
+     - zabbix-docker_default
+     - zabbix-docker_frontend
   stop_grace_period: 10s
   sysctls:
    - net.core.somaxconn=65535
@@ -358,6 +363,10 @@ services:
    backend:
     aliases:
      - zabbix-web-nginx-mysql
+   frontend:
+    # aliases:
+    # #  - zabbix-docker_default
+    # #  - zabbix-docker_frontend
   labels:
    com.zabbix.description: "Zabbix frontend on Nginx web-server with MySQL database support"
    com.zabbix.dbtype: "mysql"
@@ -378,6 +387,10 @@ services:
    backend:
     aliases:
      - zabbix-web-nginx-pgsql
+   frontend:
+    aliases:
+     - zabbix-docker_default
+     - zabbix-docker_frontend
   labels:
    com.zabbix.description: "Zabbix frontend on Nginx web-server with PostgreSQL database support"
    com.zabbix.dbtype: "pgsql"
@@ -582,6 +595,10 @@ services:
    backend:
     aliases:
      - zabbix-web-service
+   frontend:
+    aliases:
+     - zabbix-docker_default
+     - zabbix-docker_frontend     
   stop_grace_period: 5s
   labels:
    com.zabbix.description: "Zabbix web service"

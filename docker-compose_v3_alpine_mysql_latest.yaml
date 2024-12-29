@@ -6,6 +6,16 @@ services:
   image: "${ZABBIX_SERVER_MYSQL_IMAGE}:${ZABBIX_ALPINE_IMAGE_TAG}${ZABBIX_IMAGE_TAG_POSTFIX}"
   volumes:
    - /etc/timezone:/etc/timezone:ro
+  dns:
+    - 192.168.200.1
+    - 127.0.0.11
+  # dns_search:
+  # - local.home
+  # - mooseninja.co.uk
+  extra_hosts:
+    - "monitor.mooseninja.co.uk:192.168.200.145"
+    - "monitor.local.home:192.168.200.145"    
+    - "router.local.home:192.168.200.1"
   depends_on:
    - mysql-server
   labels:
@@ -40,8 +50,15 @@ services:
   image: "${ZABBIX_WEB_APACHE_MYSQL_IMAGE}:${ZABBIX_ALPINE_IMAGE_TAG}${ZABBIX_IMAGE_TAG_POSTFIX}"
   volumes:
    - /etc/timezone:/etc/timezone:ro
+  dns:
+  - 192.168.200.1
+  dns_search:
+  - local.home
+  - mooseninja.co.uk
+  extra_hosts:
+    - "monitor.mooseninja.co.uk:192.168.200.145"
   depends_on:
-   - mysql-server
+   - zabbix-server
   labels:
    com.zabbix.os: "${ALPINE_OS_TAG}"
 
@@ -52,8 +69,15 @@ services:
   image: "${ZABBIX_WEB_NGINX_MYSQL_IMAGE}:${ZABBIX_ALPINE_IMAGE_TAG}${ZABBIX_IMAGE_TAG_POSTFIX}"
   volumes:
    - /etc/timezone:/etc/timezone:ro
+  dns:
+  - 192.168.200.1
+  dns_search:
+  - local.home
+  - mooseninja.co.uk
+  extra_hosts:
+    - "monitor.mooseninja.co.uk:192.168.200.145"
   depends_on:
-   - mysql-server
+   - zabbix-server
   labels:
    com.zabbix.os: "${ALPINE_OS_TAG}"
 
@@ -64,6 +88,13 @@ services:
   image: "${ZABBIX_AGENT_IMAGE}:${ZABBIX_ALPINE_IMAGE_TAG}${ZABBIX_IMAGE_TAG_POSTFIX}"
   volumes:
    - /etc/timezone:/etc/timezone:ro
+  dns:
+  - 192.168.200.1
+  dns_search:
+  - local.home
+  - mooseninja.co.uk
+  extra_hosts:
+    - "monitor.mooseninja.co.uk:192.168.200.145"   
   labels:
    com.zabbix.os: "${ALPINE_OS_TAG}"
 
@@ -88,8 +119,17 @@ services:
    file: compose_zabbix_components.yaml
    service: web-service
   image: "${ZABBIX_WEB_SERVICE_IMAGE}:${ZABBIX_ALPINE_IMAGE_TAG}${ZABBIX_IMAGE_TAG_POSTFIX}"
+  dns:
+  - 192.168.200.1
+  dns_search:
+  - local.home
+  - mooseninja.co.uk
+  extra_hosts:
+    - "monitor.mooseninja.co.uk:192.168.200.145"
   labels:
    com.zabbix.os: "${ALPINE_OS_TAG}"
+  depends_on:
+   - zabbix-server
 
  mysql-server:
   extends:
@@ -140,6 +180,7 @@ networks:
       driver: "${BACKEND_NETWORK_DRIVER}"
       config:
       - subnet: "${BACKEND_SUBNET}"
+        gateway: "${BACKEND_GATEWAY}"
   database:
     driver: bridge
     driver_opts:
